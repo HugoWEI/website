@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quant Portfolio – for XTX</title>
+    <meta name="description" content="Projects, tutorials, and research notes focused on market microstructure, execution, and options—tailored for a quantitative trading internship.">
+    <!-- Tailwind Play CDN (good enough for GitHub Pages) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React 18 + Babel for single‑file JSX on GitHub Pages -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Your Name",
+        "url": "https://your-username.github.io/xtx-portfolio",
+        "jobTitle": "Aspiring Quant Researcher/Engineer"
+      }
+    </script>
+    <style>
+      html { scroll-behavior: smooth; }
+    </style>
+  </head>
+  <body class="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useMemo } = React;
+
+      function App() {
+        const sections = [
+          { id: "home", label: "Home" },
+          { id: "portfolio", label: "Projects" },
+          { id: "tutorials", label: "Tutorials" },
+          { id: "writeups", label: "Writeups" },
+          { id: "resume", label: "Résumé" },
+          { id: "contact", label: "Contact" },
+        ];
+
+        const [route, setRoute] = useState(window.location.hash.replace('#','') || 'home');
+        const [dark, setDark] = useState(true);
+
+        useEffect(() => {
+          const onHash = () => setRoute(window.location.hash.replace('#','') || 'home');
+          window.addEventListener('hashchange', onHash);
+          return () => window.removeEventListener('hashchange', onHash);
+        }, []);
+
+        useEffect(() => {
+          document.documentElement.classList.toggle('dark', dark);
+        }, [dark]);
+
+        const projects = useMemo(() => ([
+          {
+            title: "Limit Order Book Simulator (LOBSim)",
+            year: 2025,
+            tags: ["market microstructure", "simulation", "python"],
+            blurb: "Event‑driven LOB simulator with Poisson order flow, price impact, and queue dynamics.",
+            highlights: [
+              "Matching engine (price‑time priority) with O(1) ops via deque buckets",
+              "Calibrated to BTCUSDT; validated with KS tests",
+              "Benchmarked execution cost vs. POV/IS TWAP",
+            ],
+            links: { code: "#", demo: "#", writeup: "#" },
+          },
+          {
+            title: "Volatility Surface Fitter",
+            year: 2025,
+            tags: ["options", "optimization", "rust"],
+            blurb: "SABR + SVI hybrid with arbitrage constraints and Tikhonov regularization.",
+            highlights: [
+              "Rust + Rayon parallel slices (6× faster than Python)",
+              "No‑butterfly/no‑calendar arbitrage",
+              "Greeks validation & PnL attribution",
+            ],
+            links: { code: "#", demo: "#", writeup: "#" },
+          },
+          {
+            title: "Low‑Latency Feature Extractor",
+            year: 2024,
+            tags: ["cpp", "latency", "infra"],
+            blurb: "Lock‑free ring buffer + SIMD feature transforms for streaming ticks.",
+            highlights: [
+              "SPSC queue, cache‑friendly",
+              "~2.3µs end‑to‑end @ 99p on dev box",
+              "Unit + property tests",
+            ],
+            links: { code: "#", demo: "#", writeup: "#" },
+          },
+          {
+            title: "Alpha Research: Intraday Mean Reversion",
+            year: 2024,
+            tags: ["research", "stats", "execution"],
+            blurb: "Feature neutralization, nested CV, and leakage‑safe walk‑forward.",
+            highlights: [
+              "Purged K‑fold CV; embargo",
+              "Orthogonalized to risk factors; HHI & turnover constraints",
+              "POV vs IS under microstructure noise",
+            ],
+            links: { code: "#", demo: "#", writeup: "#" },
+          },
+        ]), []);
+
+        const tutorials = useMemo(() => ([
+          {
+            title: "Order Book 101 → Matching Engines",
+            time: "45–60 min",
+            steps: ["Visualize L1/L2; price‑time priority","Implement minimal LOB in Python","Add cancels/modifies; verify queue dynamics","Stress with synthetic Poisson arrivals"],
+            outcome: "Working matching engine + tests.",
+            link: "#",
+          },
+          {
+            title: "Microstructure Alpha: Imbalance & Queue Models",
+            time: "60–90 min",
+            steps: ["Compute OFI","Estimate queue depletion probabilities","Backtest with costs","Report IC, turnover, capacity"],
+            outcome: "Leakage‑safe micro‑alpha backtest.",
+            link: "#",
+          },
+          {
+            title: "Latency‑Aware Engineering Basics",
+            time: "40–60 min",
+            steps: ["Profiling: perf/rdtsc/flamegraphs","Cache lines, false sharing","SIMD feature kernels"],
+            outcome: "Deterministic, profiled data path.",
+            link: "#",
+          },
+          {
+            title: "Options: Calibrating SABR & SVI",
+            time: "60–120 min",
+            steps: ["Clean surface; no‑arb checks","SABR initial params via Hagan","SVI calibration with constraints","Pricing sanity & Greeks"],
+            outcome: "Smooth, arbitrage‑free surface.",
+            link: "#",
+          },
+        ]), []);
+
+        const writeups = useMemo(() => ([
+          { title: "Leakage‑safe model evaluation in intraday data", date: "2025‑09‑18", summary: "Purged K‑fold CV, embargo, and combinatorial CV to prevent look‑ahead bias on dense tick data.", link: "#" },
+          { title: "Execution benchmarking: POV vs IS vs Adaptive TWAP", date: "2025‑08‑02", summary: "Impact/decay modeling, queue priority, and adverse selection under different liquidity regimes.", link: "#" },
+          { title: "Practical guide to making backtests reproducible", date: "2025‑06‑21", summary: "Seeds, artifacts, feature stores, notebooks → reports; what to pin, what to parametrize.", link: "#" },
+        ]), []);
+
+        return (
+          <div className="min-h-screen transition-colors">
+            <Header sections={sections} route={route} dark={dark} setDark={setDark} />
+            <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
+              {route === 'home' && <Hero />}
+              {route === 'portfolio' && <Portfolio projects={projects} />}
+              {route === 'tutorials' && <Tutorials tutorials={tutorials} />}
+              {route === 'writeups' && <Writeups posts={writeups} />}
+              {route === 'resume' && <Resume />}
+              {route === 'contact' && <Contact />}
+            </main>
+            <Footer />
+          </div>
+        );
+      }
+
+      function Header({ sections, route, dark, setDark }) {
+        return (
+          <header className="sticky top-0 z-40 w-full border-b border-slate-200/60 dark:border-slate-800/60 backdrop-blur bg-white/70 dark:bg-slate-950/70">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+              <a href="#home" className="font-semibold tracking-tight text-lg">quant<span className="text-sky-500">.folio</span></a>
+              <nav className="hidden md:flex gap-1">
+                {sections.map(s => (
+                  <a key={s.id} href={`#${s.id}`} className={`px-3 py-2 rounded-xl text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 ${route===s.id? 'bg-slate-100 dark:bg-slate-800': ''}`}>{s.label}</a>
+                ))}
+              </nav>
+              <div className="flex items-center gap-2">
+                <a href="#resume" className="px-3 py-2 rounded-xl text-sm font-semibold bg-sky-500/90 hover:bg-sky-500 text-white">Résumé</a>
+                <button aria-label="Toggle theme" onClick={() => setDark(v=>!v)} className="px-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">{dark ? '🌙' : '☀️'}</button>
+              </div>
+            </div>
+          </header>
+        );
+      }
+
+      function Hero() {
+        return (
+          <section className="py-10 sm:py-16">
+            <div className="grid md:grid-cols-2 gap-10 items-center">
+              <div>
+                <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                  Building, testing, and explaining
+                  <span className="block text-sky-500">market microstructure systems</span>
+                </h1>
+                <p className="mt-5 text-slate-600 dark:text-slate-300 max-w-prose">
+                  I’m an aspiring quantitative researcher/engineer focused on matching engines, execution algorithms, and options modeling.
+                  This site curates hands‑on projects, reproducible tutorials, and short writeups tailored to what a team like XTX values: rigor, clarity, and speed.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <a href="#portfolio" className="px-4 py-2 rounded-2xl bg-sky-500/90 hover:bg-sky-500 text-white font-medium">See Projects</a>
+                  <a href="#tutorials" className="px-4 py-2 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium">Start Tutorials</a>
+                </div>
+                <p className="mt-6 text-xs text-slate-500">Open‑source • Fast • No tracking • GitHub Pages</p>
+              </div>
+              <div className="md:justify-self-end">
+                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                  <ul className="grid grid-cols-2 gap-4 text-sm">
+                    {[["Languages","Python, C++, Rust"],["Domains","LOBs, Execution, Options"],["Tooling","pytest, perf, rdtsc"],["Data","Tick/Tape, Options chains"]].map(([k,v]) => (
+                      <li key={k} className="space-y-1"><div className="text-slate-500 dark:text-slate-400">{k}</div><div className="font-medium">{v}</div></li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      function Portfolio({ projects }) {
+        return (
+          <section>
+            <h2 className="text-3xl font-bold tracking-tight">Projects</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">Focused, reproducible builds with code, tests, and short writeups.</p>
+            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.map((p) => (
+                <article key={p.title} className="group border border-slate-200 dark:border-slate-800 rounded-3xl p-5 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-lg">{p.title}</h3>
+                    <span className="text-xs text-slate-500">{p.year}</span>
+                  </div>
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{p.blurb}</p>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {p.tags.map(t => (
+                      <li key={t} className="text-[11px] px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800">{t}</li>
+                    ))}
+                  </ul>
+                  <ul className="mt-4 list-disc list-inside text-sm space-y-1">
+                    {p.highlights.map(h => <li key={h}>{h}</li>)}
+                  </ul>
+                  <div className="mt-5 flex gap-2">
+                    <a href={p.links.code} className="text-sm px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">Code</a>
+                    <a href={p.links.writeup} className="text-sm px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">Writeup</a>
+                    <a href={p.links.demo} className="text-sm px-3 py-1.5 rounded-xl bg-sky-500/90 hover:bg-sky-500 text-white">Demo</a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        );
+      }
+
+      function Tutorials({ tutorials }) {
+        return (
+          <section>
+            <h2 className="text-3xl font-bold tracking-tight">Tutorials</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">Short, targeted exercises that build a quant trading core toolkit.</p>
+            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {tutorials.map(t => (
+                <article key={t.title} className="border border-slate-200 dark:border-slate-800 rounded-3xl p-5">
+                  <h3 className="font-semibold">{t.title}</h3>
+                  <div className="mt-1 text-xs text-slate-500">{t.time}</div>
+                  <ul className="mt-3 list-decimal list-inside text-sm space-y-1">
+                    {t.steps.map(s => <li key={s}>{s}</li>)}
+                  </ul>
+                  <div className="mt-3 text-sm"><span className="text-slate-500">Outcome:</span> {t.outcome}</div>
+                  <a href={t.link} className="mt-4 inline-block text-sm px-3 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">Open</a>
+                </article>
+              ))}
+            </div>
+            <div className="mt-8 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
+              <h4 className="font-semibold">Syllabus guidance for an XTX‑targeted portfolio</h4>
+              <ul className="mt-3 grid sm:grid-cols-2 gap-2 text-sm">
+                <li>Microstructure & LOB mechanics</li>
+                <li>Execution algorithms & impact modeling</li>
+                <li>Statistical learning with leakage control</li>
+                <li>Options modeling (SABR/SVI), risk & hedging</li>
+                <li>Latency‑aware engineering & profiling</li>
+                <li>Numerics: optimization, convexity, autodiff basics</li>
+              </ul>
+            </div>
+          </section>
+        );
+      }
+
+      function Writeups({ posts }) {
+        return (
+          <section>
+            <h2 className="text-3xl font-bold tracking-tight">Writeups</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">Concise, defensible explanations of choices and trade‑offs.</p>
+            <div className="mt-6 space-y-4">
+              {posts.map(p => (
+                <article key={p.title} className="border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+                  <div className="text-xs text-slate-500">{p.date}</div>
+                  <a href={p.link} className="mt-1 block text-lg font-semibold hover:underline">{p.title}</a>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">{p.summary}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        );
+      }
+
+      function Resume() {
+        return (
+          <section>
+            <h2 className="text-3xl font-bold tracking-tight">Résumé</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">One page summary and highlights.
+              <span className="block text-xs mt-1">Tip: keep a PDF at <code>/resume.pdf</code> and link it here.</span>
+            </p>
+            <div className="mt-6 grid md:grid-cols-2 gap-6">
+              <div className="space-y-3 text-sm">
+                <h3 className="font-semibold">Education</h3>
+                <ul className="list-disc list-inside">
+                  <li><strong>University</strong> — BSc/MSc in Math/CS/Finance (Year–Year)</li>
+                  <li>Key courses: Probability, Stochastic Calc, Optimization, Systems</li>
+                </ul>
+                <h3 className="font-semibold mt-4">Experience</h3>
+                <ul className="list-disc list-inside">
+                  <li><strong>Role</strong> — Company (Dates). Built X, reduced latency by Y%, wrote Z tests.</li>
+                  <li><strong>Projects</strong>: LOBSim, options fitter, latency toolkit.</li>
+                </ul>
+                <h3 className="font-semibold mt-4">Skills</h3>
+                <ul className="list-disc list-inside">
+                  <li>Python (pandas, numba), C++ (17/20), Rust</li>
+                  <li>Profiling (perf, rdtsc), Linux, git</li>
+                  <li>Stats/ML: CV, regularization, time‑series</li>
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+                <h4 className="font-semibold">Download</h4>
+                <a className="inline-block mt-2 px-4 py-2 rounded-xl bg-sky-500/90 hover:bg-sky-500 text-white" href="/resume.pdf">Download PDF</a>
+                <h4 className="font-semibold mt-5">Highlights</h4>
+                <ul className="list-disc list-inside text-sm space-y-1 mt-2">
+                  <li>Built an event‑driven LOB sim; validated against real data</li>
+                  <li>Wrote latency‑aware feature pipeline (C++), profiled end‑to‑end</li>
+                  <li>Calibrated SABR/SVI with no‑arb constraints</li>
+                  <li>Backtests with leakage controls; reproducible reports</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      function Contact() {
+        const [copied, setCopied] = useState(false);
+        const email = "you@example.com";
+        return (
+          <section>
+            <h2 className="text-3xl font-bold tracking-tight">Contact</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">Happy to chat about research problems, engineering challenges, and internships.</p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <a href={`mailto:${email}`} className="px-4 py-2 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">Email me</a>
+              <button onClick={() => { navigator.clipboard.writeText(email); setCopied(true); setTimeout(()=>setCopied(false), 1200); }} className="px-4 py-2 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">Copy email</button>
+              {copied && <span className="text-xs text-green-600 dark:text-green-400">Copied!</span>}
+            </div>
+            <div className="mt-8 grid sm:grid-cols-2 gap-4 text-sm">
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+                <h4 className="font-semibold">What I’m looking for</h4>
+                <p>Quant Research/Engineering internship where I can contribute to microstructure research, execution, and options modeling.</p>
+              </div>
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+                <h4 className="font-semibold">How I work</h4>
+                <ul className="list-disc list-inside">
+                  <li>Reproducible, tested, benchmarked</li>
+                  <li>Explainable decisions (short writeups)</li>
+                  <li>Bias‑aware evaluation (no leakage)</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      function Footer() {
+        return (
+          <footer className="mt-16 border-t border-slate-200 dark:border-slate-800">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 text-sm text-slate-500 flex flex-wrap items-center justify-between gap-3">
+              <div>© {new Date().getFullYear()} Your Name</div>
+              <div className="flex items-center gap-2">
+                <a href="#writeups" className="hover:underline">RSS</a>
+                <span>·</span>
+                <a href="#contact" className="hover:underline">Contact</a>
+              </div>
+            </div>
+          </footer>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quant Portfolio – for XTX</title>
+    <meta name="description" content="Projects, tutorials, and research notes focused on market microstructure, execution, and options—tailored for a quantitative trading internship.">
+    <!-- Tailwind Play CDN (good enough for GitHub Pages) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React 18 + Babel for single‑file JSX on GitHub Pages -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Your Name",
+        "url": "https://your-username.github.io/xtx-portfolio",
+        "jobTitle": "Aspiring Quant Researcher/Engineer"
+      }
+    </script>
+    <style>
+      html { scroll-behavior: smooth; }
+    </style>
+  </head>
+  <body class="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useMemo } = React;
+
+      function App() {
+        const sections = [
+          { id: "home", label: "Home" },
+          { id: "portfolio", label: "Projects" },
+          { id: "tutorials", label: "Tutorials" },
+          { id: "writeups", label: "Writeups" },
+          { id: "resume", label: "Résumé" },
+          { id: "contact", label: "Contact" },
+        ];
+
+        const [route, setRoute] = useState(window.location.hash.replace('#','') || 'home');
+        const [dark, setDark] = useState(true);
+
+        useEffect(() => {
+          const onHash = () => setRoute(window.location.hash.replace('#','') || 'home');
+          window.addEventListener('hashchange', onHash);
+          return () => window.removeEventListener('hashchange', onHash);
+        }, []);
+
+        useEffect(() => {
+          document.documentElement.classList.toggle('dark', dark);
+        }, [dark]);
+
+        const projects = useMemo(() => ([
+          {
+            title: "Limit Order Book Simulator (LOBSim)",
+            year: 2025,
+            tags: ["market microstructure", "simulation", "python"],
+            blurb: "Event‑driven LOB simulator with Poisson order flow, price impact, and queue dynamics.",
+            highlights: [
+              "Matching engine (price‑time priority) with O(1) ops via deque buckets",
+              "Calibrated to BTCUSDT; validated with KS tests",
+              "Benchmarked execution cost vs. POV/IS TWAP",
+            ],
+            links: { code: "#", demo: "#", writeup: "#" },
+          },
+          {
+            title: "Volatility Surface Fitter",
+            year: 2025,
+            tags: ["options", "optimization", "rust"],
+            blurb: "SABR + SVI hybrid with arbitrage constraints and Tikhonov regularization.",
+            highlights: [
+              "Rust + Rayon parallel slices (6× faster than Python)",
+              "No‑butterfly/no‑calendar arbitrage",
+              "Greeks validation & PnL attribution",
+            ],
+            links: { code: "#", demo: "#", writeup: "#" },
+          },
+          {
+            title: "Low‑Latency Feature Extractor",
+            year: 2024,
+            tags: ["cpp", "latency", "infra"],
+            blurb: "Lock‑free ring buffer + SIMD feature transforms for streaming ticks.",
+            highlights: [
+              "SPSC queue, cache‑friendly",
+              "~2.3µs end‑to‑end @ 99p on dev box",
+              "Unit + property tests",
+            ],
+            links: { code: "#", demo: "#", writeup: "#" },
+          },
+          {
+            title: "Alpha Research: Intraday Mean Reversion",
+            year: 2024,
+            tags: ["research", "stats", "execution"],
+            blurb: "Feature neutralization, nested CV, and leakage‑safe walk‑forward.",
+            highlights: [
+              "Purged K‑fold CV; embargo",
+              "Orthogonalized to risk factors; HHI & turnover constraints",
+              "POV vs IS under microstructure noise",
+            ],
+            links: { code: "#", demo: "#", writeup: "#" },
+          },
+        ]), []);
+
+        const tutorials = useMemo(() => ([
+          {
+            title: "Order Book 101 → Matching Engines",
+            time: "45–60 min",
+            steps: ["Visualize L1/L2; price‑time priority","Implement minimal LOB in Python","Add cancels/modifies; verify queue dynamics","Stress with synthetic Poisson arrivals"],
+            outcome: "Working matching engine + tests.",
+            link: "#",
+          },
+          {
+            title: "Microstructure Alpha: Imbalance & Queue Models",
+            time: "60–90 min",
+            steps: ["Compute OFI","Estimate queue depletion probabilities","Backtest with costs","Report IC, turnover, capacity"],
+            outcome: "Leakage‑safe micro‑alpha backtest.",
+            link: "#",
+          },
+          {
+            title: "Latency‑Aware Engineering Basics",
+            time: "40–60 min",
+            steps: ["Profiling: perf/rdtsc/flamegraphs","Cache lines, false sharing","SIMD feature kernels"],
+            outcome: "Deterministic, profiled data path.",
+            link: "#",
+          },
+          {
+            title: "Options: Calibrating SABR & SVI",
+            time: "60–120 min",
+            steps: ["Clean surface; no‑arb checks","SABR initial params via Hagan","SVI calibration with constraints","Pricing sanity & Greeks"],
+            outcome: "Smooth, arbitrage‑free surface.",
+            link: "#",
+          },
+        ]), []);
+
+        const writeups = useMemo(() => ([
+          { title: "Leakage‑safe model evaluation in intraday data", date: "2025‑09‑18", summary: "Purged K‑fold CV, embargo, and combinatorial CV to prevent look‑ahead bias on dense tick data.", link: "#" },
+          { title: "Execution benchmarking: POV vs IS vs Adaptive TWAP", date: "2025‑08‑02", summary: "Impact/decay modeling, queue priority, and adverse selection under different liquidity regimes.", link: "#" },
+          { title: "Practical guide to making backtests reproducible", date: "2025‑06‑21", summary: "Seeds, artifacts, feature stores, notebooks → reports; what to pin, what to parametrize.", link: "#" },
+        ]), []);
+
+        return (
+          <div className="min-h-screen transition-colors">
+            <Header sections={sections} route={route} dark={dark} setDark={setDark} />
+            <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
+              {route === 'home' && <Hero />}
+              {route === 'portfolio' && <Portfolio projects={projects} />}
+              {route === 'tutorials' && <Tutorials tutorials={tutorials} />}
+              {route === 'writeups' && <Writeups posts={writeups} />}
+              {route === 'resume' && <Resume />}
+              {route === 'contact' && <Contact />}
+            </main>
+            <Footer />
+          </div>
+        );
+      }
+
+      function Header({ sections, route, dark, setDark }) {
+        return (
+          <header className="sticky top-0 z-40 w-full border-b border-slate-200/60 dark:border-slate-800/60 backdrop-blur bg-white/70 dark:bg-slate-950/70">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+              <a href="#home" className="font-semibold tracking-tight text-lg">quant<span className="text-sky-500">.folio</span></a>
+              <nav className="hidden md:flex gap-1">
+                {sections.map(s => (
+                  <a key={s.id} href={`#${s.id}`} className={`px-3 py-2 rounded-xl text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 ${route===s.id? 'bg-slate-100 dark:bg-slate-800': ''}`}>{s.label}</a>
+                ))}
+              </nav>
+              <div className="flex items-center gap-2">
+                <a href="#resume" className="px-3 py-2 rounded-xl text-sm font-semibold bg-sky-500/90 hover:bg-sky-500 text-white">Résumé</a>
+                <button aria-label="Toggle theme" onClick={() => setDark(v=>!v)} className="px-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">{dark ? '🌙' : '☀️'}</button>
+              </div>
+            </div>
+          </header>
+        );
+      }
+
+      function Hero() {
+        return (
+          <section className="py-10 sm:py-16">
+            <div className="grid md:grid-cols-2 gap-10 items-center">
+              <div>
+                <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                  Building, testing, and explaining
+                  <span className="block text-sky-500">market microstructure systems</span>
+                </h1>
+                <p className="mt-5 text-slate-600 dark:text-slate-300 max-w-prose">
+                  I’m an aspiring quantitative researcher/engineer focused on matching engines, execution algorithms, and options modeling.
+                  This site curates hands‑on projects, reproducible tutorials, and short writeups tailored to what a team like XTX values: rigor, clarity, and speed.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <a href="#portfolio" className="px-4 py-2 rounded-2xl bg-sky-500/90 hover:bg-sky-500 text-white font-medium">See Projects</a>
+                  <a href="#tutorials" className="px-4 py-2 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium">Start Tutorials</a>
+                </div>
+                <p className="mt-6 text-xs text-slate-500">Open‑source • Fast • No tracking • GitHub Pages</p>
+              </div>
+              <div className="md:justify-self-end">
+                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                  <ul className="grid grid-cols-2 gap-4 text-sm">
+                    {[["Languages","Python, C++, Rust"],["Domains","LOBs, Execution, Options"],["Tooling","pytest, perf, rdtsc"],["Data","Tick/Tape, Options chains"]].map(([k,v]) => (
+                      <li key={k} className="space-y-1"><div className="text-slate-500 dark:text-slate-400">{k}</div><div className="font-medium">{v}</div></li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      function Portfolio({ projects }) {
+        return (
+          <section>
+            <h2 className="text-3xl font-bold tracking-tight">Projects</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">Focused, reproducible builds with code, tests, and short writeups.</p>
+            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.map((p) => (
+                <article key={p.title} className="group border border-slate-200 dark:border-slate-800 rounded-3xl p-5 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-lg">{p.title}</h3>
+                    <span className="text-xs text-slate-500">{p.year}</span>
+                  </div>
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{p.blurb}</p>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {p.tags.map(t => (
+                      <li key={t} className="text-[11px] px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800">{t}</li>
+                    ))}
+                  </ul>
+                  <ul className="mt-4 list-disc list-inside text-sm space-y-1">
+                    {p.highlights.map(h => <li key={h}>{h}</li>)}
+                  </ul>
+                  <div className="mt-5 flex gap-2">
+                    <a href={p.links.code} className="text-sm px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">Code</a>
+                    <a href={p.links.writeup} className="text-sm px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">Writeup</a>
+                    <a href={p.links.demo} className="text-sm px-3 py-1.5 rounded-xl bg-sky-500/90 hover:bg-sky-500 text-white">Demo</a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        );
+      }
+
+      function Tutorials({ tutorials }) {
+        return (
+          <section>
+            <h2 className="text-3xl font-bold tracking-tight">Tutorials</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">Short, targeted exercises that build a quant trading core toolkit.</p>
+            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {tutorials.map(t => (
+                <article key={t.title} className="border border-slate-200 dark:border-slate-800 rounded-3xl p-5">
+                  <h3 className="font-semibold">{t.title}</h3>
+                  <div className="mt-1 text-xs text-slate-500">{t.time}</div>
+                  <ul className="mt-3 list-decimal list-inside text-sm space-y-1">
+                    {t.steps.map(s => <li key={s}>{s}</li>)}
+                  </ul>
+                  <div className="mt-3 text-sm"><span className="text-slate-500">Outcome:</span> {t.outcome}</div>
+                  <a href={t.link} className="mt-4 inline-block text-sm px-3 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">Open</a>
+                </article>
+              ))}
+            </div>
+            <div className="mt-8 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
+              <h4 className="font-semibold">Syllabus guidance for an XTX‑targeted portfolio</h4>
+              <ul className="mt-3 grid sm:grid-cols-2 gap-2 text-sm">
+                <li>Microstructure & LOB mechanics</li>
+                <li>Execution algorithms & impact modeling</li>
+                <li>Statistical learning with leakage control</li>
+                <li>Options modeling (SABR/SVI), risk & hedging</li>
+                <li>Latency‑aware engineering & profiling</li>
+                <li>Numerics: optimization, convexity, autodiff basics</li>
+              </ul>
+            </div>
+          </section>
+        );
+      }
+
+      function Writeups({ posts }) {
+        return (
+          <section>
+            <h2 className="text-3xl font-bold tracking-tight">Writeups</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">Concise, defensible explanations of choices and trade‑offs.</p>
+            <div className="mt-6 space-y-4">
+              {posts.map(p => (
+                <article key={p.title} className="border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+                  <div className="text-xs text-slate-500">{p.date}</div>
+                  <a href={p.link} className="mt-1 block text-lg font-semibold hover:underline">{p.title}</a>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">{p.summary}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        );
+      }
+
+      function Resume() {
+        return (
+          <section>
+            <h2 className="text-3xl font-bold tracking-tight">Résumé</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">One page summary and highlights.
+              <span className="block text-xs mt-1">Tip: keep a PDF at <code>/resume.pdf</code> and link it here.</span>
+            </p>
+            <div className="mt-6 grid md:grid-cols-2 gap-6">
+              <div className="space-y-3 text-sm">
+                <h3 className="font-semibold">Education</h3>
+                <ul className="list-disc list-inside">
+                  <li><strong>University</strong> — BSc/MSc in Math/CS/Finance (Year–Year)</li>
+                  <li>Key courses: Probability, Stochastic Calc, Optimization, Systems</li>
+                </ul>
+                <h3 className="font-semibold mt-4">Experience</h3>
+                <ul className="list-disc list-inside">
+                  <li><strong>Role</strong> — Company (Dates). Built X, reduced latency by Y%, wrote Z tests.</li>
+                  <li><strong>Projects</strong>: LOBSim, options fitter, latency toolkit.</li>
+                </ul>
+                <h3 className="font-semibold mt-4">Skills</h3>
+                <ul className="list-disc list-inside">
+                  <li>Python (pandas, numba), C++ (17/20), Rust</li>
+                  <li>Profiling (perf, rdtsc), Linux, git</li>
+                  <li>Stats/ML: CV, regularization, time‑series</li>
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+                <h4 className="font-semibold">Download</h4>
+                <a className="inline-block mt-2 px-4 py-2 rounded-xl bg-sky-500/90 hover:bg-sky-500 text-white" href="/resume.pdf">Download PDF</a>
+                <h4 className="font-semibold mt-5">Highlights</h4>
+                <ul className="list-disc list-inside text-sm space-y-1 mt-2">
+                  <li>Built an event‑driven LOB sim; validated against real data</li>
+                  <li>Wrote latency‑aware feature pipeline (C++), profiled end‑to‑end</li>
+                  <li>Calibrated SABR/SVI with no‑arb constraints</li>
+                  <li>Backtests with leakage controls; reproducible reports</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      function Contact() {
+        const [copied, setCopied] = useState(false);
+        const email = "you@example.com";
+        return (
+          <section>
+            <h2 className="text-3xl font-bold tracking-tight">Contact</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">Happy to chat about research problems, engineering challenges, and internships.</p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <a href={`mailto:${email}`} className="px-4 py-2 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">Email me</a>
+              <button onClick={() => { navigator.clipboard.writeText(email); setCopied(true); setTimeout(()=>setCopied(false), 1200); }} className="px-4 py-2 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">Copy email</button>
+              {copied && <span className="text-xs text-green-600 dark:text-green-400">Copied!</span>}
+            </div>
+            <div className="mt-8 grid sm:grid-cols-2 gap-4 text-sm">
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+                <h4 className="font-semibold">What I’m looking for</h4>
+                <p>Quant Research/Engineering internship where I can contribute to microstructure research, execution, and options modeling.</p>
+              </div>
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+                <h4 className="font-semibold">How I work</h4>
+                <ul className="list-disc list-inside">
+                  <li>Reproducible, tested, benchmarked</li>
+                  <li>Explainable decisions (short writeups)</li>
+                  <li>Bias‑aware evaluation (no leakage)</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      function Footer() {
+        return (
+          <footer className="mt-16 border-t border-slate-200 dark:border-slate-800">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 text-sm text-slate-500 flex flex-wrap items-center justify-between gap-3">
+              <div>© {new Date().getFullYear()} Your Name</div>
+              <div className="flex items-center gap-2">
+                <a href="#writeups" className="hover:underline">RSS</a>
+                <span>·</span>
+                <a href="#contact" className="hover:underline">Contact</a>
+              </div>
+            </div>
+          </footer>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
